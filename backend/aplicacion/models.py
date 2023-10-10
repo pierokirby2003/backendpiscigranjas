@@ -2,74 +2,40 @@ from django.db import models
 
 # Create your models 
 
-class Usuario(models.Model):
-    UsuarioID = models.AutoField(primary_key=True)
-    NombreUsuario = models.CharField(max_length=50, unique=False)
-    Apellido = models.CharField(max_length=50, unique=False)
-    Contrasena = models.CharField(max_length=50, unique=False)
-    Rol = models.CharField(max_length=50, blank=True, null=True)
+class Rol(models.Model):
+    nombre = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.NombreUsuario
-
-class Genero(models.Model):
-    id_genero = models.AutoField(primary_key=True)
-    genero = models.CharField(max_length=100)
-
-    def _str_(self):
-        return self.genero
+class Piscigranja(models.Model):
+    nombre = models.CharField(max_length=100)
+    ubicacion = models.CharField(max_length=100)
+    tamano = models.DecimalField(max_digits=10, decimal_places=2)
 
 class Estanque(models.Model):
-    idestanque = models.AutoField(primary_key=True)
-    valor = models.DecimalField(max_digits=10, decimal_places=2)
-    capacidad = models.DecimalField(max_digits=10, decimal_places=2)
-    estadoSalud = models.CharField(max_length=100)
-    cantidadPeces = models.IntegerField()
+    capacidad = models.IntegerField()
+    salud = models.CharField(max_length=100)
+    cantPeces = models.IntegerField()
+    piscigranja = models.ForeignKey(Piscigranja, on_delete=models.CASCADE, related_name='estanque')
 
-
-    def _str_(self):
-        return self.idestanque
-
-class Material(models.Model):
-    idmaterial = models.AutoField(primary_key=True)
-    nombrematerial = models.CharField(max_length=255)
-    categoria = models.CharField(max_length=100)
-
-    def _str_(self):
-        return self.nombrematerial
-
-class MaterialesEstanque(models.Model):
-    idMaterialesPiscigranja = models.AutoField(primary_key=True)
-    idestanque = models.ForeignKey(Estanque, on_delete=models.CASCADE)
-    idmaterial = models.ForeignKey(Material, on_delete=models.CASCADE)
-
-    def _str_(self):
-        return f'Materiales de Piscigranja #{self.idMaterialesPiscigranja}'
-
-class PsciGranja(models.Model):
-    idpscigranja = models.AutoField(primary_key=True)
+class MaterialNocivo(models.Model):
     nombre = models.CharField(max_length=100)
-    ubicacion = models.CharField(max_length=255)
-    tamano = models.DecimalField(max_digits=10, decimal_places=2)
-    idestanque = models.ForeignKey(Estanque, on_delete=models.CASCADE)
+    familiaMaterial = models.ForeignKey('FamiliaMaterial', on_delete=models.PROTECT, related_name='material_nocivo')
 
-    def _str_(self):
-        return self.nombre
-
-class RegistroAlimentacion(models.Model):
-    id_registro_alimentacion = models.AutoField(primary_key=True)
+class EstanqueMatNoc(models.Model):
+    idEstanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
+    idMaterialNoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
     fecha = models.DateField()
-    tipo_alimento = models.CharField(max_length=100)
-    cantidad_alimento = models.DecimalField(max_digits=10, decimal_places=2)
-    idpscigranja = models.ForeignKey(PsciGranja, on_delete=models.CASCADE)
 
-    def _str_(self):
-        return f'Registro de Alimentación #{self.id_registro_alimentacion}'
+class FamiliaMaterial(models.Model):
+    nombre = models.CharField(max_length=100)
 
-class Rol(models.Model):
-    id_genero = models.AutoField(primary_key=True)
-    nombrerol = models.CharField(max_length=100)
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    correo = models.CharField(max_length=100)
+    contrasena = models.CharField(max_length=100)
+    idRol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name='rol')
 
-    def _str_(self):
-        return self.nombrerol
+class UsuarioXPiscigranja(models.Model):
+    idPiscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
+    idUsuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
 
