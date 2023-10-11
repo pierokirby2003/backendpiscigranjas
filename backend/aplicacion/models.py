@@ -5,6 +5,9 @@ from django.db import models
 class Rol(models.Model):
     nombre = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.nombre
+
 class Piscigranja(models.Model):
     nombre = models.CharField(max_length=100)
     ubicacion = models.CharField(max_length=100)
@@ -16,26 +19,29 @@ class Estanque(models.Model):
     cantPeces = models.IntegerField()
     piscigranja = models.ForeignKey(Piscigranja, on_delete=models.CASCADE, related_name='estanque')
 
-class MaterialNocivo(models.Model):
-    nombre = models.CharField(max_length=100)
-    familiaMaterial = models.ForeignKey('FamiliaMaterial', on_delete=models.PROTECT, related_name='material_nocivo')
-
-class EstanqueMatNoc(models.Model):
-    idEstanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
-    idMaterialNoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
-    fecha = models.DateField()
-
 class FamiliaMaterial(models.Model):
     nombre = models.CharField(max_length=100)
+
+class MaterialNocivo(models.Model):
+    nombre = models.CharField(max_length=100)
+    familiaMaterial = models.ForeignKey(FamiliaMaterial, on_delete=models.PROTECT, related_name='material_nocivo')
+
+class EstanqueMatNoc(models.Model):
+    estanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
+    materialNoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
+    fecha = models.DateField()
 
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     correo = models.CharField(max_length=100)
     contrasena = models.CharField(max_length=100)
-    idRol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name='rol')
+    rol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name='rol')
 
+    def __str__(self):
+        return self.nombre + " " + self.apellido
+    
 class UsuarioXPiscigranja(models.Model):
-    idPiscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
-    idUsuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
+    piscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
+    usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
 
