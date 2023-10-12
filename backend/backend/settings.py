@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -79,8 +82,8 @@ DATABASES = {
         #'ENGINE': 'sql_server.pyodbc',
         'ENGINE': 'mssql',
         'NAME': 'BDPiscigranja',
-        #'USER': '',
-        #'PASSWORD': '',
+        'USER': 'rulitosmaricon',
+        'PASSWORD': '123456',
         'HOST': 'DESKTOP-H12FNFE',
         #'PORT': '',
         'OPTIONS': {
@@ -131,3 +134,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)

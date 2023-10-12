@@ -12,24 +12,23 @@ def registrar_usuario(request):
         data = json.loads(request.body)
         nombre = data.get("nombre")
         apellido = data.get("apellido")
+        correo = data.get("email")
         contrasena = data.get("contrasena")
-        idRol = data.get("idRol")
-        idPiscigranja = data.get("idPiscigranja")
+        rol = data.get("idRol")
 
         # Verificar que los IDs de genero, rol y piscigranja existan en la base de datos
         try:
-            rol = Rol.objects.get(pk=idRol)
-            piscigranja = Piscigranja.objects.get(pk=idPiscigranja)
-        except (Rol.DoesNotExist, Piscigranja.DoesNotExist):
-            return JsonResponse({"error": "ID rol o piscigranja no válido"}, status=400)
+            rol = Rol.objects.get(pk=rol)
+        except (Rol.DoesNotExist):
+            return JsonResponse({"error": "ID rol no válido"}, status=400)
 
         # Crear el nuevo usuario
         nuevo_usuario = Usuario(
             nombre=nombre,
             apellido=apellido,
+            correo = correo,
             contrasena=contrasena,
-            rol=rol,
-            piscigranja=piscigranja
+            rol=rol
         )
         nuevo_usuario.save()
 
@@ -45,11 +44,16 @@ def iniciar_sesion(request):
     if request.method == "POST":
         # Parsear los datos del formulario JSON
         data = json.loads(request.body)
-        nombre = data.get("nombre")
+        correo = data.get("email") #lo de adentro es lo que se envía desde el front
         contrasena = data.get("contrasena")
 
+        print(correo)
+        print(contrasena)
+
         # Autenticar al usuario
-        user = authenticate(request, username=nombre, password=contrasena)
+        user = authenticate(request, username=correo, password=contrasena)
+        print(user)
+
         if user is not None:
             # Iniciar sesión para el usuario autenticado
             login(request, user)
@@ -59,6 +63,7 @@ def iniciar_sesion(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+
     
 """
 @csrf_exempt
