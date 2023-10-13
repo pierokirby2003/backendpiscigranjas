@@ -41,6 +41,14 @@ class Usuario(models.Model):
     def __str__(self):
         return self.nombre + " " + self.apellido
     
+    @staticmethod
+    def authenticate(correo, contrasena):
+        try:
+            user = Usuario.objects.get(username=correo, password=contrasena)
+            return user
+        except Usuario.DoesNotExist:
+            return None
+    
 class UsuarioXPiscigranja(models.Model):
     piscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
     usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')

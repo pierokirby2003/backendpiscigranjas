@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from random import randint
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from aplicacion.models import Usuario, Rol, Piscigranja  # Asegúrate de importar los modelos adecuados
 import json
 
@@ -44,21 +45,19 @@ def iniciar_sesion(request):
     if request.method == "POST":
         # Parsear los datos del formulario JSON
         data = json.loads(request.body)
-        correo = data.get("email") #lo de adentro es lo que se envía desde el front
+        correo = data.get("email")
         contrasena = data.get("contrasena")
 
-        print(correo)
-        print(contrasena)
-
-        # Autenticar al usuario
-        user = authenticate(request, username=correo, password=contrasena)
-        print(user)
-
-        if user is not None:
+        try:
+            # Busca un usuario en la base de datos que coincida con el correo y la contraseña
+            user = Usuario.objects.get(correo=correo, contrasena=contrasena)
             # Iniciar sesión para el usuario autenticado
-            login(request, user)
+            # Aquí puedes realizar alguna lógica adicional si es necesario
+            # Por ejemplo, almacenar información en la sesión.
+            request.session['user_id'] = user.id
+
             return JsonResponse({"mensaje": "Inicio de sesión exitoso"})
-        else:
+        except Usuario.DoesNotExist:
             return JsonResponse({"error": "Credenciales incorrectas"}, status=401)
 
     else:
