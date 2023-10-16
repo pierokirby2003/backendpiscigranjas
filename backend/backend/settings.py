@@ -30,9 +30,6 @@ SECRET_KEY = 'django-insecure-csy77iwy8st+nz7cgru&j^rhpi&clcx$(nwsovc0ww-s0i0%0m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,10 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'aplicacion'
+    'aplicacion',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.contrib.sessions.middleware.SessionMiddleware'
             ],
         },
     },
@@ -136,3 +136,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "127.0.0.1:3000"]
+#ALLOWED_HOSTS = ["localhost", "http://127.0.0.1:3000"]
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+
+CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
+
+CORS_ALLOW_ALL_ORIGINS = True #: Modificar
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587 
+EMAIL_HOST_USER = "piscigranjadanitahs" # Usuario
+EMAIL_HOST_PASSWORD = "ybsabfruogcnkagx" # Poner contraseña del gmail
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_NAME = "my_session_id"

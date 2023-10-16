@@ -24,4 +24,7 @@ urlpatterns = [
     #path('admin/', admin.site.urls),
     path('login/', views.iniciar_sesion),
     path('register/', views.registrar_usuario),
+    path('enviar_codigo/', views.enviar_codigo),
+    path('cambiar_contraseña/', views.cambiar_contraseña),
+    path('verificar_codigo/', views.verificar_codigo)
 ]
