@@ -3,10 +3,12 @@ from django.contrib.auth import authenticate, login
 from random import randint
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from aplicacion.models import Usuario, Rol, Piscigranja  # Asegúrate de importar los modelos adecuados
+from aplicacion.models import Usuario, Rol, MaterialNocivo,EstanqueMatNoc,Piscigranja  # Asegúrate de importar los modelos adecuados
 import json
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import Count
+from django.db import connection
 
 @csrf_exempt
 def registrar_usuario(request):
@@ -54,6 +56,12 @@ def iniciar_sesion(request):
             user = Usuario.objects.get(correo=correo, contrasena=contrasena)
             print(user)
             # Iniciar sesión para el usuario autenticado
+            if user:
+                dictOK={
+                    "error":""
+                }
+                return JsonResponse(dictOK)
+            
             # Aquí puedes realizar alguna lógica adicional si es necesario
             # Por ejemplo, almacenar información en la sesión.
             request.session['user_id'] = user.id
@@ -82,7 +90,9 @@ def enviar_codigo(request):
         # Almacena el código temporalmente para su verificación
         request.session['codigo_verificacion'] = codigo
         print(request.session['codigo_verificacion'])
-        print(request.session[settings.SESSION_COOKIE_NAME])
+
+        #session_id = request.session.session_key
+        #print("session_id:", session_id)
         
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [correo]
@@ -104,8 +114,10 @@ def verificar_codigo(request):
 
         print(codigo_ingresado)
         codigo_almacenado = request.session.get('codigo_verificacion')
-        print(request.session[settings.SESSION_COOKIE_NAME])
-        print(codigo_almacenado)
+        
+        #session_id = request.session.session_key
+        #print("session_id:", session_id)
+        print("Código de verificación almacenado en la sesión:", codigo_almacenado)
 
         return JsonResponse({"Codigo": codigo_almacenado}) #Queremos arrojar el codigo verficacion, no el ingresado
         """
@@ -164,4 +176,72 @@ def cambiar_contraseña(request):
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
 
-        
+
+"""
+@csrf_exempt
+def enviar_data_grafico(request):
+    if request.method == "GET":
+        materiales = MaterialNocivo.objects.all()
+        materiales = [{'id': }]
+        data = json.loads(request.body)
+        correo = data.get("email")
+        contrasena = data.get("password")
+        try:
+            # Busca un usuario en la base de datos que coincida con el correo y la contraseña
+            user = Usuario.objects.get(correo=correo, contrasena=contrasena)
+            print(user)
+            # Iniciar sesión para el usuario autenticado
+            # Aquí puedes realizar alguna lógica adicional si es necesario
+            # Por ejemplo, almacenar información en la sesión.
+            request.session['user_id'] = user.id
+            
+            return JsonResponse({"mensaje": "Inicio de sesión exitoso"})
+        except Usuario.DoesNotExist:
+            return JsonResponse({"error": "Credenciales incorrectas"}, status=401)
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)"""
+"""
+@csrf_exempt
+def enviar_conteo_materiales(request):
+    # Realiza la consulta para contar los materiales nocivos y sus cantidades
+    query_result = MaterialNocivo.objects.annotate(cantidad=Count('estanque_matnoc__id')).values('nombre', 'cantidad')
+    
+    # Convierte los resultados en un formato adecuado para el gráfico
+    labels = [item['nombre'] for item in query_result]
+    data = [item['cantidad'] for item in query_result]
+
+    response_data = {
+        'labels': labels,
+        'data': data,
+    }
+
+    return JsonResponse(response_data)"""
+
+
+@csrf_exempt
+def obtener_conteo_materiales(request):
+    # Ejecuta una consulta SQL personalizada
+    with connection.cursor() as cursor:
+        cursor.execute("select B.nombre, count(*) as cantidad from [dbo].[aplicacion_estanquematnoc] as A inner join [dbo].[aplicacion_materialnocivo] as B on B.id = A.materialNoc_id group by B.nombre")
+        results = cursor.fetchall()
+
+    # Procesa los resultados y crea una respuesta
+    response_data = [{"nombre": nombre, "cantidad": cantidad} for nombre, cantidad in results]
+    print(response_data)
+    return JsonResponse(response_data, safe=False)
+    
+    """# Realiza la consulta para contar la cantidad de registros agrupados por 'materialNoc'
+    resultado = EstanqueMatNoc.objects.values('materialNoc_id').annotate(cantidad=Count('materialNoc'))
+
+    # Procesa los resultados para crear dos listas: nombres y cantidades
+    nombres = [registro['materialNoc__nombre'] for registro in resultado]
+    cantidades = [registro['cantidad'] for registro in resultado]
+
+    # Crea un diccionario con los datos
+    data = {
+        'labels': nombres,
+        'data': cantidades
+    }
+
+    return JsonResponse(data)"""

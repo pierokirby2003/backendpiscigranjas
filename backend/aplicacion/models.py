@@ -1,7 +1,5 @@
 from django.db import models
 
-# Create your models 
-
 class Rol(models.Model):
     nombre = models.CharField(max_length=100)
 
@@ -22,9 +20,15 @@ class Estanque(models.Model):
 class FamiliaMaterial(models.Model):
     nombre = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.nombre
+
 class MaterialNocivo(models.Model):
     nombre = models.CharField(max_length=100)
     familiaMaterial = models.ForeignKey(FamiliaMaterial, on_delete=models.PROTECT, related_name='material_nocivo')
+
+    def __str__(self):
+        return str(self.familiaMaterial) + " - " + self.nombre 
 
 class EstanqueMatNoc(models.Model):
     estanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
@@ -44,12 +48,36 @@ class Usuario(models.Model):
     @staticmethod
     def authenticate(correo, contrasena):
         try:
-            user = Usuario.objects.get(username=correo, password=contrasena)
+            user = Usuario.objects.get(correo=correo, contrasena=contrasena)
             return user
         except Usuario.DoesNotExist:
             return None
-    
+
 class UsuarioXPiscigranja(models.Model):
     piscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
     usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')
 
+# Crear una fachada para simplificar operaciones comunes
+class Facade:
+    @staticmethod
+    def get_piscigranja_by_usuario(usuario):
+        try:
+            return usuario.usuarioxpiscigranja.piscigranja
+        except UsuarioXPiscigranja.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_estanques_by_piscigranja(piscigranja):
+        return piscigranja.estanque.all()
+
+    @staticmethod
+    def get_material_nocivo_by_estanque(estanque):
+        return [emn.materialNoc for emn in estanque.estanque_matnoc.all()]
+
+    @staticmethod
+    def authenticate_and_get_user(correo, contrasena):
+        try:
+            user = Usuario.authenticate(correo, contrasena)
+            return user
+        except Usuario.DoesNotExist:
+            return None

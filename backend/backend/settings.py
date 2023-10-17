@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'corsheaders'
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_NAME = "my_session_id"
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -67,7 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.contrib.sessions.middleware.SessionMiddleware'
+                #'django.contrib.sessions.middleware.SessionMiddleware'
             ],
         },
     },
@@ -153,5 +156,3 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = "piscigranjadanitahs" # Usuario
 EMAIL_HOST_PASSWORD = "ybsabfruogcnkagx" # Poner contraseña del gmail
 
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
-SESSION_COOKIE_NAME = "my_session_id"
