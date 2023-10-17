@@ -202,7 +202,8 @@ def obtener_conteo_materiales(request):
 @csrf_exempt
 def cambiar_contrasena(request):
     if request.method == "POST":
-        data = request.POST
+        data = json.loads(request.body)
+        print(data)
         #usuario_id = data.get("correo")
         correo = correo_temp
         nueva_contrasena = data.get("password")

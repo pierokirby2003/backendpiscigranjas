@@ -28,6 +28,6 @@ urlpatterns = [
     #path('cambiar_contraseña/', views.cambiar_contraseña),
     path('verificar_codigo/', views.verificar_codigo),
     path('obtener_conteo_materiales/', views.obtener_conteo_materiales),
-    path('cambiar_contrasena/', views.cambiar_contrasena),
+    path('cambiar_contrasena/', views.cambiar_contrasena)
     #path('test/', views.test)
 ]
