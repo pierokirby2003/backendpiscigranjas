@@ -73,14 +73,19 @@ def iniciar_sesion(request):
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
 
-    
+
+codigo_almacenado = ""
+correo_temp = ""
 
 @csrf_exempt
 def enviar_codigo(request):
+    global codigo_almacenado
+    global correo_temp
     if request.method == "POST":
         # Generar un código de 4 dígitos aleatorio
         data = json.loads(request.body)
         correo = data.get("email")
+        correo_temp = correo
         print(data)
         codigo = ''.join([str(randint(0, 9)) for _ in range(4)])
         # Envía el código al usuario (puedes implementar el envío por correo electrónico o SMS aquí)
@@ -90,58 +95,49 @@ def enviar_codigo(request):
         # Almacena el código temporalmente para su verificación
         request.session['codigo_verificacion'] = codigo
         print(request.session['codigo_verificacion'])
-
+        codigo_almacenado = request.session['codigo_verificacion']
+        print("este es el codigo almacenado:",codigo_almacenado)
         #session_id = request.session.session_key
         #print("session_id:", session_id)
         
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [correo]
         send_mail("Envio de codigo", codigo, email_from, recipient_list)
-
+        #test(request)
         return JsonResponse({"mensaje": "Código de verificación enviado con éxito", "data": response_data})
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
         
+"""@csrf_exempt
+def test(request):
+        print("Este es del test: ", request.session['codigo_verificacion'])
+        return request.session['codigo_verificacion']"""
 
 
 @csrf_exempt
 def verificar_codigo(request):
     if request.method == "POST":
-        # Obtener el código de verificación y la nueva contraseña del formulario JSON
+        # Obtener el código de verificación del formulario JSON
         data = json.loads(request.body)
         codigo_ingresado = data.get("resultado")
-
         print(codigo_ingresado)
-        codigo_almacenado = request.session.get('codigo_verificacion')
+        print(codigo_almacenado)
         
-        #session_id = request.session.session_key
-        #print("session_id:", session_id)
-        print("Código de verificación almacenado en la sesión:", codigo_almacenado)
-
-        return JsonResponse({"Codigo": codigo_almacenado}) #Queremos arrojar el codigo verficacion, no el ingresado
-        """
-        if codigo_almacenado and codigo_ingresado == codigo_almacenado:
-            # El código de verificación es válido, cambia la contraseña del usuario
-
-            # Recupera al usuario cuya contraseña se va a cambiar
-            # Supongamos que estás utilizando el nombre de usuario como identificación
-
-            # Cambia la contraseña del usuario
-            #usuario.set_password(nueva_contraseña)
-
-            # Limpia el código almacenado en la sesión después de su uso
-            del request.session['codigo_verificacion']
-
-            return JsonResponse({"mensaje": "Contraseña cambiada con éxito"})
+        # Si el código almacenado coincide con el código ingresado
+        if codigo_almacenado == codigo_ingresado:
+            dictOK={
+                    "error":""
+                }
+            return JsonResponse(dictOK)
         else:
             return JsonResponse({"error": "Código de verificación incorrecto"}, status=400)
-
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
-    """
 
+    
 
+"""
 @csrf_exempt
 def cambiar_contraseña(request):
     if request.method == "POST":
@@ -151,7 +147,7 @@ def cambiar_contraseña(request):
         nueva_contraseña = data.get("nueva_contraseña")
 
         # Obtener el código almacenado en la sesión
-        codigo_almacenado = request.session.get('codigo_verificacion')
+        #codigo_almacenado = request.session.get('codigo_verificacion')
 
         if codigo_almacenado and codigo_ingresado == codigo_almacenado:
             # El código de verificación es válido, cambia la contraseña del usuario
@@ -174,49 +170,7 @@ def cambiar_contraseña(request):
             return JsonResponse({"error": "Código de verificación incorrecto"}, status=400)
 
     else:
-        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
-
-
-"""
-@csrf_exempt
-def enviar_data_grafico(request):
-    if request.method == "GET":
-        materiales = MaterialNocivo.objects.all()
-        materiales = [{'id': }]
-        data = json.loads(request.body)
-        correo = data.get("email")
-        contrasena = data.get("password")
-        try:
-            # Busca un usuario en la base de datos que coincida con el correo y la contraseña
-            user = Usuario.objects.get(correo=correo, contrasena=contrasena)
-            print(user)
-            # Iniciar sesión para el usuario autenticado
-            # Aquí puedes realizar alguna lógica adicional si es necesario
-            # Por ejemplo, almacenar información en la sesión.
-            request.session['user_id'] = user.id
-            
-            return JsonResponse({"mensaje": "Inicio de sesión exitoso"})
-        except Usuario.DoesNotExist:
-            return JsonResponse({"error": "Credenciales incorrectas"}, status=401)
-
-    else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)"""
-"""
-@csrf_exempt
-def enviar_conteo_materiales(request):
-    # Realiza la consulta para contar los materiales nocivos y sus cantidades
-    query_result = MaterialNocivo.objects.annotate(cantidad=Count('estanque_matnoc__id')).values('nombre', 'cantidad')
-    
-    # Convierte los resultados en un formato adecuado para el gráfico
-    labels = [item['nombre'] for item in query_result]
-    data = [item['cantidad'] for item in query_result]
-
-    response_data = {
-        'labels': labels,
-        'data': data,
-    }
-
-    return JsonResponse(response_data)"""
 
 
 @csrf_exempt
@@ -245,3 +199,21 @@ def obtener_conteo_materiales(request):
     }
 
     return JsonResponse(data)"""
+@csrf_exempt
+def cambiar_contrasena(request):
+    if request.method == "POST":
+        data = request.POST
+        #usuario_id = data.get("correo")
+        correo = correo_temp
+        nueva_contrasena = data.get("password")
+        print(nueva_contrasena)
+        try:
+            #usuario = Usuario.objects.get(pk=usuario_id)
+            usuario = Usuario.objects.get(correo = correo)
+            usuario.contrasena = nueva_contrasena
+            usuario.save()
+            return JsonResponse({"mensaje": "Contraseña cambiada con éxito"})
+        except Usuario.DoesNotExist:
+            return JsonResponse({"error": "Usuario no encontrado"}, status=404)
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
