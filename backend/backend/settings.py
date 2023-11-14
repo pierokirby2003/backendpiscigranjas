@@ -82,10 +82,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         #'ENGINE': 'sql_server.pyodbc',
         'ENGINE': 'mssql',
+        #'ENGINE': 'sqlserver_ado',
         'NAME': 'BDPiscigranja',
         'USER': 'rulitosmaricon',
         'PASSWORD': '123456',
@@ -96,8 +97,19 @@ DATABASES = {
             #'encrypt': 'false',
         },
     }
-}
+}"""
 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'dDagF-dE2fAbdDAGf-cGGDFaEd5B1FGf',
+        'HOST': 'monorail.proxy.rlwy.net',
+        'PORT': '26471',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

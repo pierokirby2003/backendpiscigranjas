@@ -58,15 +58,10 @@ def iniciar_sesion(request):
             # Iniciar sesión para el usuario autenticado
             if user:
                 dictOK={
-                    "error":""
+                    "error":"Inicio de sesión exitoso"
                 }
                 return JsonResponse(dictOK)
             
-            # Aquí puedes realizar alguna lógica adicional si es necesario
-            # Por ejemplo, almacenar información en la sesión.
-            request.session['user_id'] = user.id
-            
-            return JsonResponse({"mensaje": "Inicio de sesión exitoso"})
         except Usuario.DoesNotExist:
             return JsonResponse({"error": "Credenciales incorrectas"}, status=401)
 
@@ -170,14 +165,15 @@ def cambiar_contraseña(request):
             return JsonResponse({"error": "Código de verificación incorrecto"}, status=400)
 
     else:
-        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)"""
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+    """
 
 
 @csrf_exempt
 def obtener_conteo_materiales(request):
     # Ejecuta una consulta SQL personalizada
     with connection.cursor() as cursor:
-        cursor.execute("select B.nombre, count(*) as cantidad from [dbo].[aplicacion_estanquematnoc] as A inner join [dbo].[aplicacion_materialnocivo] as B on B.id = A.materialNoc_id group by B.nombre")
+        cursor.execute("select B.nombre, count(*) as cantidad from aplicacion_estanquematnoc as A inner join aplicacion_materialnocivo as B on B.id = A.id group by B.nombre")
         results = cursor.fetchall()
 
     # Procesa los resultados y crea una respuesta
@@ -185,20 +181,7 @@ def obtener_conteo_materiales(request):
     print(response_data)
     return JsonResponse(response_data, safe=False)
     
-    """# Realiza la consulta para contar la cantidad de registros agrupados por 'materialNoc'
-    resultado = EstanqueMatNoc.objects.values('materialNoc_id').annotate(cantidad=Count('materialNoc'))
 
-    # Procesa los resultados para crear dos listas: nombres y cantidades
-    nombres = [registro['materialNoc__nombre'] for registro in resultado]
-    cantidades = [registro['cantidad'] for registro in resultado]
-
-    # Crea un diccionario con los datos
-    data = {
-        'labels': nombres,
-        'data': cantidades
-    }
-
-    return JsonResponse(data)"""
 @csrf_exempt
 def cambiar_contrasena(request):
     if request.method == "POST":
