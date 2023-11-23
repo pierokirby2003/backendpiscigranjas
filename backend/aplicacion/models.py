@@ -25,15 +25,15 @@ class FamiliaMaterial(models.Model):
 
 class MaterialNocivo(models.Model):
     nombre = models.CharField(max_length=100)
-    familiaMaterial = models.ForeignKey(FamiliaMaterial, on_delete=models.PROTECT, related_name='material_nocivo')
-    #descripcion = models.CharField(max_length=100)
+    familiamaterial = models.ForeignKey(FamiliaMaterial, on_delete=models.PROTECT, related_name='material_nocivo')
+    descripcion = models.CharField(max_length=100)
 
     def __str__(self):
-        return str(self.familiaMaterial) + " - " + self.nombre 
+        return str(self.familiamaterial) + " - " + self.nombre 
 
 class EstanqueMatNoc(models.Model):
     estanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
-    materialNoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
+    materialnoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
     fecha = models.DateField()
 
 class Usuario(models.Model):

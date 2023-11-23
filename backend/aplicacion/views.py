@@ -173,13 +173,81 @@ def cambiar_contraseña(request):
 def obtener_conteo_materiales(request):
     # Ejecuta una consulta SQL personalizada
     with connection.cursor() as cursor:
-        cursor.execute("select B.nombre, count(*) as cantidad from aplicacion_estanquematnoc as A inner join aplicacion_materialnocivo as B on B.id = A.id group by B.nombre")
+        cursor.execute("select B.nombre as nombre, count(*) as cantidad from aplicacion_EstanqueMatNoc as A inner join aplicacion_MaterialNocivo as B on a.materialnoc_id = b.id group by nombre")
         results = cursor.fetchall()
 
     # Procesa los resultados y crea una respuesta
     response_data = [{"nombre": nombre, "cantidad": cantidad} for nombre, cantidad in results]
     print(response_data)
     return JsonResponse(response_data, safe=False)
+
+
+"""@csrf_exempt
+def obtener_columnas(request):
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM aplicacion_materialnocivo LIMIT 0")
+        columns = [col_desc[0] for col_desc in cursor.description]
+        print(columns)
+    return columns"""
+
+
+# Esto es parte de HU14: te da TODA la lista de materiales
+@csrf_exempt
+def obtener_lista_materiales(request):
+    # Ejecuta una consulta SQL personalizada con parámetros
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT A.nombre as nombre, A.descripcion FROM aplicacion_materialnocivo as A")
+        results = cursor.fetchall()
+
+    # Procesa los resultados y crea una respuesta
+    response_data = [{"Nombre de material": nombre, "descripcion": descripcion} for nombre, descripcion in results]
+    print(response_data)
+    return JsonResponse(response_data, safe=False)
+
+
+
+
+# Esto es parte de HU14: te da la lista de materiales por nombre de material ingresado
+@csrf_exempt
+def obtener_lista_materialesxnombre(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        nombre = data.get("nombre")
+
+        # Ejecuta una consulta SQL personalizada con parámetros
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT A.nombre as nombre, A.descripcion FROM aplicacion_materialnocivo as A WHERE A.nombre = %s", [nombre])
+            results = cursor.fetchall()
+
+        # Procesa los resultados y crea una respuesta
+        response_data = [{"Nombre de material": nombre, "descripcion": descripcion} for nombre, descripcion in results]
+        print(response_data)
+        return JsonResponse(response_data, safe=False)
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+
+
+# Esto es parte de HU14: te da la lista de materiales por categoria ingresada
+@csrf_exempt
+def obtener_lista_materialesxcategoria(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        nombre_familia = data.get("nombre_familia")
+
+        # Ejecuta una consulta SQL personalizada con parámetros
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT A.nombre as nombre, A.descripcion FROM aplicacion_materialnocivo as A INNER JOIN aplicacion_familiamaterial as B ON a.familiaMaterial_id = B.id WHERE B.nombre = %s", [nombre_familia])
+            results = cursor.fetchall()
+
+        # Procesa los resultados y crea una respuesta
+        response_data = [{"Nombre de material": nombre, "descripcion": descripcion} for nombre, descripcion in results]
+        print(response_data)
+        return JsonResponse(response_data, safe=False)
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+
     
 
 @csrf_exempt
