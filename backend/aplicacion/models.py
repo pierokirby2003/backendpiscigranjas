@@ -39,6 +39,13 @@ class EstanqueMatNoc(models.Model):
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
+    usuario=models.CharField(max_length=100,default=None)
+    telefono=models.CharField(max_length=100,default=None)
+    ciudad=models.CharField(max_length=100,default=None)
+    pais=models.CharField(max_length=100,default=None)
+    empresa=models.CharField(max_length=100,default="0000")
+    nruc=models.CharField(max_length=100,default="0000")
+    direccion=models.CharField(max_length=100,default="0000")
     correo = models.CharField(max_length=100)
     contrasena = models.CharField(max_length=100)
     rol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name='rol')
