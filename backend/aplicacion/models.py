@@ -13,12 +13,38 @@ class empresas(models.Model):
     numero_telefono=models.CharField(max_length=50)
     ciudad=models.CharField(max_length=50)
     pais=models.CharField(max_length=50)
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    usuario=models.CharField(max_length=100,default="0000")
+    telefono=models.CharField(max_length=100,default=None)
+    telefono_personal=models.CharField(max_length=100,default="0000")
+    ciudad_personal=models.CharField(max_length=100,default="0000")
+    pais_personal=models.CharField(max_length=100,default="0000")
+    ciudad=models.CharField(max_length=100,default=None)
+    pais=models.CharField(max_length=100,default=None)
+    empresa=models.CharField(max_length=100,default="0000")
+    nruc=models.CharField(max_length=100,default="0000")
+    direccion=models.CharField(max_length=100,default="0000")
+    correo = models.CharField(max_length=100)
+    contrasena = models.CharField(max_length=100)
+    rol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name='rol')
 
+    def __str__(self):
+        return self.nombre + " " + self.apellido
+    
+    @staticmethod
+    def authenticate(correo, contrasena):
+        try:
+            user = Usuario.objects.get(correo=correo, contrasena=contrasena)
+            return user
+        except Usuario.DoesNotExist:
+            return None
 class Piscigranja(models.Model):
     nombre = models.CharField(max_length=100)
     ubicacion = models.CharField(max_length=100)
     tamano = models.DecimalField(max_digits=10, decimal_places=2)
-
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="piscigranja_set")
 class Estanque(models.Model):
     capacidad = models.IntegerField()
     salud = models.CharField(max_length=100)
@@ -44,30 +70,7 @@ class EstanqueMatNoc(models.Model):
     materialnoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
     fecha = models.DateField()
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    usuario=models.CharField(max_length=100,default="0000")
-    telefono=models.CharField(max_length=100,default=None)
-    ciudad=models.CharField(max_length=100,default=None)
-    pais=models.CharField(max_length=100,default=None)
-    empresa=models.CharField(max_length=100,default="0000")
-    nruc=models.CharField(max_length=100,default="0000")
-    direccion=models.CharField(max_length=100,default="0000")
-    correo = models.CharField(max_length=100)
-    contrasena = models.CharField(max_length=100)
-    rol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name='rol')
 
-    def __str__(self):
-        return self.nombre + " " + self.apellido
-    
-    @staticmethod
-    def authenticate(correo, contrasena):
-        try:
-            user = Usuario.objects.get(correo=correo, contrasena=contrasena)
-            return user
-        except Usuario.DoesNotExist:
-            return None
 
 class UsuarioXPiscigranja(models.Model):
     piscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')

@@ -35,7 +35,10 @@ urlpatterns = [
     path('enviar_correo_entidad/', views.enviar_correo_entidad),
     path('enviar_correo_soporte/', views.enviar_correo_soporte),
     path('cambiar_contrasena/', views.cambiar_contrasena),
-    path('validarruc/',views.validar_ruc)
+    path('configurar_perfil/', views.configurar_perfil),
+    path('validarruc/',views.validar_ruc),
+    path('obtener_usuario/',views.obtener_usuario),
+    path('obtener_estanques/',views.estanques_por_usuario)
     #path('obtener_columnas/', views.obtener_columnas)
     #path('test/', views.test)
 ]
