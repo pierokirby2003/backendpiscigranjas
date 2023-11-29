@@ -287,7 +287,7 @@ def configurar_perfil(request):
     if request.method == "POST":
         data = json.loads(request.body)
         nombre = data.get("nombre")
-        correo= data.get("correo")
+        correo= data.get("email")
         apellido=data.get("apellido")
         telefono=data.get("telefono")
         ciudad=data.get("ciudad")
@@ -297,11 +297,11 @@ def configurar_perfil(request):
             usuario = Usuario.objects.get(correo = correo)
             usuario.nombre=nombre
             usuario.apellido=apellido
-            usuario.telefono=telefono
-            usuario.ciudad=ciudad
-            usuario.pais=pais
+            usuario.telefono_personal=telefono
+            usuario.ciudad_personal=ciudad
+            usuario.pais_personal=pais
             usuario.save()
-            return JsonResponse({"mensaje": "Usuario configurado con éxito"})
+            return JsonResponse({"error": ""})
         except Usuario.DoesNotExist:
             return JsonResponse({"error": "Usuario no encontrado"}, status=404)
     else:
@@ -334,3 +334,37 @@ def validar_ruc(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+@csrf_exempt
+def obtener_usuario(request):
+    if request.method == "POST":
+        # Parsear los datos del formulario JSON
+        data = json.loads(request.body)
+        email = data.get("email")
+        try:
+            # Busca un usuario en la base de datos que coincida con el correo y la contraseña
+            usuario = Usuario.objects.filter(correo=email).first()
+            print(usuario)
+            # Iniciar sesión para el usuario autenticado
+            if usuario:
+                dictOK={
+                    "nombre":usuario.nombre,
+                    "apellido":usuario.apellido,
+                    "telefono_personal":usuario.telefono_personal,
+                    "correo":usuario.correo,
+                    "ciudad_personal":usuario.ciudad_personal,
+                    "pais_personal":usuario.pais_personal,
+                    "compañia":usuario.empresa,
+                    "nruc":usuario.nruc,
+                    "sede":usuario.direccion,
+                    "telefono_empresa":usuario.telefono,
+                    "ciudad":usuario.ciudad,
+                    "pais":usuario.pais
+
+                }
+                return JsonResponse(dictOK)
+            
+        except empresas.DoesNotExist:
+            return JsonResponse({"error": "ruc no existe incorrectas"}, status=401)
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405) 
