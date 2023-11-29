@@ -13,37 +13,6 @@ class empresas(models.Model):
     numero_telefono=models.CharField(max_length=50)
     ciudad=models.CharField(max_length=50)
     pais=models.CharField(max_length=50)
-
-class Piscigranja(models.Model):
-    nombre = models.CharField(max_length=100)
-    ubicacion = models.CharField(max_length=100)
-    tamano = models.DecimalField(max_digits=10, decimal_places=2)
-
-class Estanque(models.Model):
-    capacidad = models.IntegerField()
-    salud = models.CharField(max_length=100)
-    cantPeces = models.IntegerField()
-    piscigranja = models.ForeignKey(Piscigranja, on_delete=models.CASCADE, related_name='estanque')
-
-class FamiliaMaterial(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
-
-class MaterialNocivo(models.Model):
-    nombre = models.CharField(max_length=100)
-    familiamaterial = models.ForeignKey(FamiliaMaterial, on_delete=models.PROTECT, related_name='material_nocivo')
-    descripcion = models.CharField(max_length=100)
-
-    def __str__(self):
-        return str(self.familiamaterial) + " - " + self.nombre 
-
-class EstanqueMatNoc(models.Model):
-    estanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
-    materialnoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
-    fecha = models.DateField()
-
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
@@ -71,6 +40,37 @@ class Usuario(models.Model):
             return user
         except Usuario.DoesNotExist:
             return None
+class Piscigranja(models.Model):
+    nombre = models.CharField(max_length=100)
+    ubicacion = models.CharField(max_length=100)
+    tamano = models.DecimalField(max_digits=10, decimal_places=2)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="piscigranja_set")
+class Estanque(models.Model):
+    capacidad = models.IntegerField()
+    salud = models.CharField(max_length=100)
+    cantPeces = models.IntegerField()
+    piscigranja = models.ForeignKey(Piscigranja, on_delete=models.CASCADE, related_name='estanque')
+
+class FamiliaMaterial(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class MaterialNocivo(models.Model):
+    nombre = models.CharField(max_length=100)
+    familiamaterial = models.ForeignKey(FamiliaMaterial, on_delete=models.PROTECT, related_name='material_nocivo')
+    descripcion = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.familiamaterial) + " - " + self.nombre 
+
+class EstanqueMatNoc(models.Model):
+    estanque = models.ForeignKey(Estanque, on_delete=models.CASCADE, related_name='estanque_matnoc')
+    materialnoc = models.ForeignKey(MaterialNocivo, on_delete=models.CASCADE, related_name='estanque_matnoc')
+    fecha = models.DateField()
+
+
 
 class UsuarioXPiscigranja(models.Model):
     piscigranja = models.ForeignKey(Piscigranja, on_delete=models.PROTECT, related_name='UsuarioXPiscigranja')

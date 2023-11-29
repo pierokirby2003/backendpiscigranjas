@@ -334,7 +334,6 @@ def validar_ruc(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
-<<<<<<< HEAD
 @csrf_exempt
 def obtener_usuario(request):
     if request.method == "POST":
@@ -369,7 +368,6 @@ def obtener_usuario(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405) 
-=======
 
 
 correo_soporte = "piscigranjadanitahs@gmail.com"
@@ -415,4 +413,30 @@ def enviar_correo_entidad(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
->>>>>>> 0e15ea6ebd6f44705fe41f4d1302317cdfcad444
+
+from django.http import JsonResponse
+
+@csrf_exempt
+def estanques_por_usuario(request):
+    try:
+        if request.method == "POST":
+            data = json.loads(request.body)
+            usuario_id = data.get("email")
+            usuario_id = "renzosaucedos@gmail.com"
+            usuario = Usuario.objects.get(correo=usuario_id)
+            piscigranja = usuario.piscigranja_set.first()  # Suponiendo que un usuario solo tiene una piscigranja
+            estanques = piscigranja.estanque.all()
+            estanques_data = [
+                {
+                    'id': estanque.id,
+                    'capacidad': estanque.capacidad,
+                    'salud': estanque.salud,
+                    'cantPeces': estanque.cantPeces,
+                    'piscigranja': estanque.piscigranja_id
+                }
+                for estanque in estanques
+            ]
+            return JsonResponse(estanques_data, safe=False)
+    except Usuario.DoesNotExist:
+        return JsonResponse([], safe=False)
+
