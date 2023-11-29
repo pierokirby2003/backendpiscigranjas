@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login
 from random import randint
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from aplicacion.models import Usuario, Rol, MaterialNocivo,EstanqueMatNoc,Piscigranja  # Asegúrate de importar los modelos adecuados
+from aplicacion.models import Usuario, Rol, MaterialNocivo,EstanqueMatNoc,Piscigranja,empresas  # Asegúrate de importar los modelos adecuados
 import json
 from django.conf import settings
 from django.core.mail import send_mail
@@ -21,6 +21,12 @@ def registrar_usuario(request):
         contrasena = data.get("password")
         #rol = data.get("idRol")
         rol = "2"
+        telefono=data.get("telefono")
+        ciudad=data.get("ciudad")
+        pais=data.get("pais")
+        empresa=data.get("empresa")
+        nruc=data.get("nruc")
+        direccion=data.get("direccion")
         # Verificar rol existan en la base de datos
         try:
             rol = Rol.objects.get(pk=rol)
@@ -33,7 +39,13 @@ def registrar_usuario(request):
             apellido=apellido,
             correo = correo,
             contrasena=contrasena,
-            rol=rol
+            rol=rol,
+            telefono=telefono,
+            ciudad=ciudad,
+            pais=pais,
+            empresa=empresa,
+            nruc=nruc,
+            direccion=direccion
         )
         nuevo_usuario.save()
 
@@ -267,5 +279,58 @@ def cambiar_contrasena(request):
             return JsonResponse({"mensaje": "Contraseña cambiada con éxito"})
         except Usuario.DoesNotExist:
             return JsonResponse({"error": "Usuario no encontrado"}, status=404)
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+    
+@csrf_exempt
+def configurar_perfil(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        nombre = data.get("nombre")
+        correo= data.get("correo")
+        apellido=data.get("apellido")
+        telefono=data.get("telefono")
+        ciudad=data.get("ciudad")
+        pais=data.get("pais")
+        try:
+            #usuario = Usuario.objects.get(pk=usuario_id)
+            usuario = Usuario.objects.get(correo = correo)
+            usuario.nombre=nombre
+            usuario.apellido=apellido
+            usuario.telefono=telefono
+            usuario.ciudad=ciudad
+            usuario.pais=pais
+            usuario.save()
+            return JsonResponse({"mensaje": "Usuario configurado con éxito"})
+        except Usuario.DoesNotExist:
+            return JsonResponse({"error": "Usuario no encontrado"}, status=404)
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+    
+@csrf_exempt
+def validar_ruc(request):
+    if request.method == "POST":
+        # Parsear los datos del formulario JSON
+        data = json.loads(request.body)
+        ruc = data.get("ruc")
+        try:
+            # Busca un usuario en la base de datos que coincida con el correo y la contraseña
+            empresa = empresas.objects.get(nruc=ruc)
+            print(empresa)
+            # Iniciar sesión para el usuario autenticado
+            if empresa:
+                dictOK={
+                    "ruc":empresa.nruc,
+                    "telefono":empresa.numero_telefono,
+                    "sede":empresa.direccion_sede,
+                    "compañia":empresa.nombre_compañia,
+                    "ciudad":empresa.ciudad,
+                    "pais":empresa.pais
+                }
+                return JsonResponse(dictOK)
+            
+        except empresas.DoesNotExist:
+            return JsonResponse({"error": "ruc no existe incorrectas"}, status=401)
+
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)

@@ -32,6 +32,7 @@ urlpatterns = [
     path('obtener_lista_materialesxcategoria/', views.obtener_lista_materialesxcategoria),
     path('obtener_lista_materialesxnombre/', views.obtener_lista_materialesxnombre),
     path('cambiar_contrasena/', views.cambiar_contrasena),
+    path('validarruc/',views.validar_ruc)
     #path('obtener_columnas/', views.obtener_columnas)
     #path('test/', views.test)
 ]

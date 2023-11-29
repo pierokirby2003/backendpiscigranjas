@@ -6,6 +6,14 @@ class Rol(models.Model):
     def __str__(self):
         return self.nombre
 
+class empresas(models.Model):
+    nruc=models.CharField(max_length=50)
+    nombre_compañia=models.CharField(max_length=50)
+    direccion_sede=models.CharField(max_length=50)
+    numero_telefono=models.CharField(max_length=50)
+    ciudad=models.CharField(max_length=50)
+    pais=models.CharField(max_length=50)
+
 class Piscigranja(models.Model):
     nombre = models.CharField(max_length=100)
     ubicacion = models.CharField(max_length=100)
@@ -39,7 +47,7 @@ class EstanqueMatNoc(models.Model):
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    usuario=models.CharField(max_length=100,default=None)
+    usuario=models.CharField(max_length=100,default="0000")
     telefono=models.CharField(max_length=100,default=None)
     ciudad=models.CharField(max_length=100,default=None)
     pais=models.CharField(max_length=100,default=None)
