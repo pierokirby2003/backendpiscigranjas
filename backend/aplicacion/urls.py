@@ -28,6 +28,7 @@ urlpatterns = [
     #path('cambiar_contraseña/', views.cambiar_contraseña),
     path('verificar_codigo/', views.verificar_codigo),
     path('obtener_conteo_materiales/', views.obtener_conteo_materiales),
+    path('obtener_conteo_materialesxmes/', views.obtener_conteo_materialesxmes),
     path('obtener_lista_materiales/', views.obtener_lista_materiales),
     path('obtener_lista_materialesxcategoria/', views.obtener_lista_materialesxcategoria),
     path('obtener_lista_materialesxnombre/', views.obtener_lista_materialesxnombre),

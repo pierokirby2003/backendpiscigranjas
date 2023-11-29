@@ -194,6 +194,19 @@ def obtener_conteo_materiales(request):
     return JsonResponse(response_data, safe=False)
 
 
+@csrf_exempt
+def obtener_conteo_materialesxmes(request):
+    # Ejecuta una consulta SQL personalizada
+    with connection.cursor() as cursor:
+        cursor.execute("select to_char(A.fecha, 'Month') as mes, B.nombre as nombre, count(*) as cantidad from aplicacion_EstanqueMatNoc as A inner join aplicacion_MaterialNocivo as B on a.materialnoc_id = b.id group by mes, nombre")
+        results = cursor.fetchall()
+
+    # Procesa los resultados y crea una respuesta
+    response_data = [{"mes": mes, "nombre": nombre, "cantidad": cantidad} for mes, nombre, cantidad in results]
+    print(response_data)
+    return JsonResponse(response_data, safe=False)
+
+
 """@csrf_exempt
 def obtener_columnas(request):
     with connection.cursor() as cursor:
