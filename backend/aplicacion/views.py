@@ -334,6 +334,7 @@ def validar_ruc(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+<<<<<<< HEAD
 @csrf_exempt
 def obtener_usuario(request):
     if request.method == "POST":
@@ -368,3 +369,50 @@ def obtener_usuario(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405) 
+=======
+
+
+correo_soporte = "piscigranjadanitahs@gmail.com"
+# HU08: Comunicacion con soporte
+@csrf_exempt
+def enviar_correo_soporte(request):
+    global correo_soporte
+    if request.method == "POST":
+        # Generar un código de 4 dígitos aleatorio
+        data = json.loads(request.body)
+        asunto = data.get("asunto")
+        mensaje = "Se confirma el envío de tu ticket\n Este es el mensaje:" + data.get("mensaje")
+        print(data)
+        
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correo_soporte]
+        send_mail(asunto, mensaje, email_from, recipient_list,)
+        #test(request)
+        return JsonResponse({"mensaje": "Correo enviado con éxito"})
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+    
+
+
+
+# HU10: Comunicacion con entidad reguladora
+@csrf_exempt
+def enviar_correo_entidad(request):
+    if request.method == "POST":
+        # Generar un código de 4 dígitos aleatorio
+        data = json.loads(request.body)
+        correo_entidad = data.get("email")
+        asunto = data.get("asunto")
+        mensaje = data.get("mensaje")
+        print(data)
+        
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correo_entidad]
+        send_mail(asunto, mensaje, email_from, recipient_list)
+        #test(request)
+        return JsonResponse({"mensaje": "Correo enviado con éxito"})
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+>>>>>>> 0e15ea6ebd6f44705fe41f4d1302317cdfcad444

@@ -31,6 +31,8 @@ urlpatterns = [
     path('obtener_lista_materiales/', views.obtener_lista_materiales),
     path('obtener_lista_materialesxcategoria/', views.obtener_lista_materialesxcategoria),
     path('obtener_lista_materialesxnombre/', views.obtener_lista_materialesxnombre),
+    path('enviar_correo_entidad/', views.enviar_correo_entidad),
+    path('enviar_correo_soporte/', views.enviar_correo_soporte),
     path('cambiar_contrasena/', views.cambiar_contrasena),
     path('configurar_perfil/', views.configurar_perfil),
     path('validarruc/',views.validar_ruc),
