@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Count
 from django.db import connection
+import re
 
 @csrf_exempt
 def registrar_usuario(request):
@@ -19,25 +20,37 @@ def registrar_usuario(request):
         apellido = data.get("apellido")
         correo = data.get("email")
         contrasena = data.get("password")
-        #rol = data.get("idRol")
         rol = "2"
-        telefono=data.get("telefono")
-        ciudad=data.get("ciudad")
-        pais=data.get("pais")
-        empresa=data.get("empresa")
-        nruc=data.get("nruc")
-        direccion=data.get("direccion")
-        # Verificar rol existan en la base de datos
+        telefono = data.get("telefono")
+        ciudad = data.get("ciudad")
+        pais = data.get("pais")
+        empresa = data.get("empresa")
+        nruc = data.get("nruc")
+        direccion = data.get("direccion")
+
+        # Verificar longitud de la contraseña
+        if not (5 <= len(contrasena) <= 20):
+            return JsonResponse({"error": "La contraseña debe tener entre 5 y 20 caracteres"}, status=400)
+
+        # Verificar espacios en blanco en la contraseña
+        if ' ' in contrasena:
+            return JsonResponse({"error": "La contraseña no debe contener espacios en blanco"}, status=400)
+
+        # Verificar si el correo termina en "@gmail.com"
+        if not re.match(r"[^@]+@gmail\.com$", correo):
+            return JsonResponse({"error": "El correo debe ser de dominio @gmail.com"}, status=400)
+
+        # Verificar rol exista en la base de datos
         try:
             rol = Rol.objects.get(pk=rol)
-        except (Rol.DoesNotExist):
+        except Rol.DoesNotExist:
             return JsonResponse({"error": "ID rol no válido"}, status=400)
 
         # Crear el nuevo usuario
         nuevo_usuario = Usuario(
             nombre=nombre,
             apellido=apellido,
-            correo = correo,
+            correo=correo,
             contrasena=contrasena,
             rol=rol,
             telefono=telefono,
