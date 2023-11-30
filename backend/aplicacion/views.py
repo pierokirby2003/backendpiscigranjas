@@ -55,7 +55,6 @@ def registrar_usuario(request):
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
     
 correo_temp = ""
-# CORREGIR
 @csrf_exempt
 def iniciar_sesion(request):
     global correo_temp
@@ -348,12 +347,15 @@ def validar_ruc(request):
 
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+
+
 @csrf_exempt
 def obtener_usuario(request):
     if request.method == "POST":
         # Parsear los datos del formulario JSON
         data = json.loads(request.body)
         email = data.get("email")
+        email="renzosaucedos@gmail.com"
         try:
             # Busca un usuario en la base de datos que coincida con el correo y la contraseña
             usuario = Usuario.objects.filter(correo=email).first()
@@ -381,7 +383,7 @@ def obtener_usuario(request):
             return JsonResponse({"error": "ruc no existe incorrectas"}, status=401)
 
     else:
-        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405) 
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
 
 
 correo_soporte = "piscigranjadanitahs@gmail.com"
