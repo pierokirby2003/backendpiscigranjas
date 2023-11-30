@@ -54,14 +54,16 @@ def registrar_usuario(request):
     else:
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
     
-
+correo_temp = ""
 # CORREGIR
 @csrf_exempt
 def iniciar_sesion(request):
+    global correo_temp
     if request.method == "POST":
         # Parsear los datos del formulario JSON
         data = json.loads(request.body)
         correo = data.get("email")
+        correo_temp = correo
         contrasena = data.get("password")
         try:
             # Busca un usuario en la base de datos que coincida con el correo y la contraseña
@@ -82,7 +84,6 @@ def iniciar_sesion(request):
 
 
 codigo_almacenado = ""
-correo_temp = ""
 
 @csrf_exempt
 def enviar_codigo(request):
@@ -391,12 +392,15 @@ def enviar_correo_soporte(request):
     if request.method == "POST":
         # Generar un código de 4 dígitos aleatorio
         data = json.loads(request.body)
-        asunto = data.get("asunto")
-        mensaje = "Se confirma el envío de tu ticket\n Este es el mensaje:" + data.get("mensaje")
+        categoria = data.get("categoria")
+        urgencia = data.get("urgencia")
+        asunto = "Solicitud de Soporte"
+        descripcion = data.get("descripcion")
+        mensaje = "Se confirma el envío de tu ticket\n Este es el mensaje:\n" + asunto + "\ncategoria: " + categoria + "\nurgencia: " + urgencia + "\ndescripcion: " + descripcion
         print(data)
         
         email_from = settings.EMAIL_HOST_USER
-        recipient_list = [correo_soporte]
+        recipient_list = ['renzosaucedos@gmail.com']
         send_mail(asunto, mensaje, email_from, recipient_list,)
         #test(request)
         return JsonResponse({"mensaje": "Correo enviado con éxito"})
@@ -428,6 +432,28 @@ def enviar_correo_entidad(request):
         return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
 
 from django.http import JsonResponse
+
+
+# HU09: Solicitar limpieza
+@csrf_exempt
+def solicitar_limpieza(request):
+    global correo_soporte
+    if request.method == "POST":
+        # Generar un código de 4 dígitos aleatorio
+        data = json.loads(request.body)
+        asunto = "Limpieza - Estanque de Usuario"
+        mensaje = "El usuario Renzo Saucedo solicita limpieza para su estanque"
+        print(data)
+        
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correo_soporte]
+        send_mail(asunto, mensaje, email_from, recipient_list,)
+        #test(request)
+        return JsonResponse({"mensaje": "Correo enviado con éxito"})
+
+    else:
+        return JsonResponse({"error": "Método de solicitud no permitido"}, status=405)
+    
 
 @csrf_exempt
 def estanques_por_usuario(request):

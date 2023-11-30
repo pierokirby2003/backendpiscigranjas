@@ -34,6 +34,7 @@ urlpatterns = [
     path('obtener_lista_materialesxnombre/', views.obtener_lista_materialesxnombre),
     path('enviar_correo_entidad/', views.enviar_correo_entidad),
     path('enviar_correo_soporte/', views.enviar_correo_soporte),
+    path('solicitar_limpieza/', views.solicitar_limpieza),
     path('cambiar_contrasena/', views.cambiar_contrasena),
     path('configurar_perfil/', views.configurar_perfil),
     path('validarruc/',views.validar_ruc),
