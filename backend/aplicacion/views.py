@@ -416,16 +416,18 @@ def enviar_correo_soporte(request):
 # HU10: Comunicacion con entidad reguladora
 @csrf_exempt
 def enviar_correo_entidad(request):
+    global correo_temp
     if request.method == "POST":
         # Generar un código de 4 dígitos aleatorio
         data = json.loads(request.body)
-        correo_entidad = data.get("email")
-        asunto = data.get("asunto")
-        mensaje = data.get("mensaje")
+        asunto = "¡Alerta de Piscigranja!"
+        estado = data.get("estado")
+        comentario = data.get("comentario")
+        mensaje = "Estado: " + estado + "\n Comentario: " + comentario + "\nPronto te llegará un correo de la entidad..."
         print(data)
         
         email_from = settings.EMAIL_HOST_USER
-        recipient_list = [correo_entidad]
+        recipient_list = [correo_temp]
         send_mail(asunto, mensaje, email_from, recipient_list)
         #test(request)
         return JsonResponse({"mensaje": "Correo enviado con éxito"})
