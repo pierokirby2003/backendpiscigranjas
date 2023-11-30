@@ -11,6 +11,16 @@ from django.db.models import Count
 from django.db import connection
 import re
 
+
+def validar_longitud_contrasena(contrasena):
+    return 5 <= len(contrasena) <= 20
+
+def validar_espacios_en_blancos(contrasena):
+    return ' ' not in contrasena
+
+def validar_correo_gmail(correo):
+    return re.match(r"[^@]+@gmail\.com$", correo)
+
 @csrf_exempt
 def registrar_usuario(request):
     if request.method == "POST":
@@ -28,16 +38,16 @@ def registrar_usuario(request):
         nruc = data.get("nruc")
         direccion = data.get("direccion")
 
-        # Verificar longitud de la contraseña
-        if not (5 <= len(contrasena) <= 20):
+        # Validar longitud de la contraseña
+        if not validar_longitud_contrasena(contrasena):
             return JsonResponse({"error": "La contraseña debe tener entre 5 y 20 caracteres"}, status=400)
 
-        # Verificar espacios en blanco en la contraseña
-        if ' ' in contrasena:
+        # Validar espacios en blanco en la contraseña
+        if not validar_espacios_en_blancos(contrasena):
             return JsonResponse({"error": "La contraseña no debe contener espacios en blanco"}, status=400)
 
-        # Verificar si el correo termina en "@gmail.com"
-        if not re.match(r"[^@]+@gmail\.com$", correo):
+        # Validar si el correo termina en "@gmail.com"
+        if not validar_correo_gmail(correo):
             return JsonResponse({"error": "El correo debe ser de dominio @gmail.com"}, status=400)
 
         # Verificar rol exista en la base de datos
